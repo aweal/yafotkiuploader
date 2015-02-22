@@ -40,7 +40,8 @@ class OptionParser (optparse.OptionParser):
         for option in self.option_list:
             if (isinstance(option, Option) and
                 option.required and
-                not self.option_seen.has_key(option) and
+                not option in self.option_seen and
+                #not self.option_seen.has_key(option) and
                 not self.show_help):
                 self.error("%s not supplied" % option)
         return (values, args)

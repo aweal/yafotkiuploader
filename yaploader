@@ -159,7 +159,7 @@ class CommandAuth:
         with open(TOKEN_CACHE, 'w+') as f:
             f.write('%s: %s' % (uploader.config.username, uploader.api.token))
 
-        print 'New token was written to %r' % TOKEN_CACHE
+        print('New token was written to %r' % TOKEN_CACHE)
 
 
 class CommandUpload:
@@ -198,16 +198,16 @@ class CommandUpload:
                 storage_private=uploader.config.storage_private,
             )
             if not uploader.config.output or uploader.config.output  == 'alternate':
-                print photo.links['alternate']
+                print(photo.links['alternate'])
             else:
                 if uploader.config.output in photo.img:
-                    print photo.img[uploader.config.output]['href']
+                    print(photo.img[uploader.config.output]['href'])
                 else:
                     if uploader.config.output != 'all':
                         logging.error("This image cannot work with output format `%s'." % \
                             (uploader.config.output))
                     for x in  photo.img.keys():
-                        print x + ': ' + str(photo.img[x]['href'])
+                        print(x + ': ' + str(photo.img[x]['href']))
 
 class CommandGetAlbums:
     name = 'albums'
@@ -236,12 +236,12 @@ class CommandGetPhotos:
     def run(self, uploader, opts, args):
         user, album, photos = uploader._get_photos(opts)
         if album is not None:
-            print 'Album "%s"' % album.title
+            print('Album "%s"' % album.title)
         else:
-            print '%s photos' % user.username
+            print('%s photos' % user.username)
 
         for i, photo in enumerate(photos):
-            print '%i) "%s"' % (i+1, photo.title)
+            print('%i) "%s"' % (i+1, photo.title))
 
 
 class CommandDownload:
@@ -263,7 +263,7 @@ class CommandDownload:
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
-        print 'Downloading photos, please, be patient, it can take some time ;-)'
+        print('Downloading photos, please, be patient, it can take some time ;-)')
         for photo in photos:
             url = photo.content[0].src
             filename = photo.title
@@ -296,7 +296,7 @@ class CommandCreateAlbum:
     def run(self, uploader, opts, args):
         user = uploader.api.find_user(uploader.config.username)
         album = user.create_album(opts.title, opts.summary)
-        print 'Album was created: ' + album.links['alternate']
+        print('Album was created: ' + album.links['alternate'])
 
 
 class CommandDeleteAlbum:
@@ -318,9 +318,9 @@ class CommandDeleteAlbum:
             confirm = raw_input('Do you really want to delete album "%s" (yes/no)?\n' % yafotki.smart_str(album.title))
             if confirm == 'yes':
                 album.delete()
-                print 'Album was deleted'
+                print('Album was deleted')
             else:
-                print 'Cancelled'
+                print('Cancelled')
 
 
 class CommandDeletePhoto:
@@ -346,7 +346,7 @@ class CommandDeletePhoto:
             sys.exit(1)
 
         photo.delete()
-        print 'Photo was deleted'
+        print('Photo was deleted')
 
 
 class CommandModifyAlbum:
@@ -366,7 +366,7 @@ class CommandModifyAlbum:
         user = uploader.api.find_user(uploader.config.username)
         album = _getn(user.albums, opts.album - 1)
         uploader._save_object(album, opts)
-        print 'Album was modified'
+        print('Album was modified')
 
 
 class CommandModifyPhoto:
@@ -385,7 +385,7 @@ class CommandModifyPhoto:
         album = _getn(user.albums, opts.album - 1)
         photo = _getn(album.photos, opts.photo - 1)
         uploader._save_object(photo, opts)
-        print 'Photo was modified'
+        print('Photo was modified')
 
 
 class Uploader(object):
@@ -417,10 +417,10 @@ class Uploader(object):
                 image_count = 'empty'
 
             if self.config.verbose:
-                print '%i) "%s", real id "%s", %s' % \
-                    (i+1, album.title, album.id, image_count)
+                print('%i) "%s", real id "%s", %s' % \
+                    (i+1, album.title, album.id, image_count))
             else:
-                print '%i) "%s", %s' % (i+1, album.title, image_count)
+                print('%i) "%s", %s' % (i+1, album.title, image_count))
 
     def _save_object(self, obj, update_from):
         for field in obj.fields:
@@ -456,7 +456,7 @@ def main():
 
     commands = dict(
         (command.name, command()) \
-        for key, command in globals().iteritems() \
+        for key, command in globals().items() \
             if key.startswith('Command'))
 
     args = sys.argv
@@ -480,15 +480,15 @@ def main():
     def print_help():
         parser.print_help()
         if command is None:
-            print '\nCommands:'
+            print('\nCommands:')
             for cmd in commands.values():
-                print '%16s %s' % (cmd.name, getattr(cmd, 'description', ''))
+                print('%16s %s' % (cmd.name, getattr(cmd, 'description', '')))
 
     opts, args = parser.parse_args(args)
 
     if opts.version:
-        print 'Python uploader for http://fotki.yandex.ru, version %s.' % yafotki.__version__
-        print 'For more information and new versions, visit http://svetlyak.ru.'
+        print('Python uploader for http://fotki.yandex.ru, version %s.' % yafotki.__version__)
+        print('For more information and new versions, visit http://svetlyak.ru.')
         sys.exit(0)
 
     if opts.help or command is None:

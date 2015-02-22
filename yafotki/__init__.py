@@ -60,14 +60,18 @@ class ACCESS:
 
 
 def smart_str(value):
-    if isinstance(value, unicode):
-        return value.encode('utf-8')
-    return value
-
+    #if isinstance(value, unicode):
+    #    return value.encode('utf-8')
+    #return value
+    if isinstance(value, str):
+        return value
+    else:
+        return value.decode('utf-8')
 
 def smart_unicode(value):
     if isinstance(value, str):
-        return value.decode('utf-8')
+        #return value.decode('utf-8')
+        return value
     return value
 
 
@@ -107,7 +111,7 @@ class Entry(object):
         self._api = api
         self._entry = entry
 
-        for key, value in entry.iteritems():
+        for key, value in entry.items():
             if getattr(self, key, None) is None:
                 setattr(self, key, value)
 
@@ -150,7 +154,8 @@ class Photo(Entry):
         return self._tags
 
     def _set_tags(self, value):
-        if isinstance(value, basestring):
+        #if isinstance(value, basestring):
+        if isinstance(value, str):
             self._tags = [v.strip() for v in value.split(',')]
         else:
             self._tags = value.keys()
@@ -225,7 +230,7 @@ class Api(object):
         logging.debug('GET from %r' % url)
         response = requests.get(url, headers=self._headers())
         assert response.status_code == 200, response.content
-        return json.loads(response.content)
+        return json.loads(response.content.decode("utf-8"))
 
     def _delete(self, url, parser = None):
         url = self._build_absolute_url(url)
@@ -261,7 +266,6 @@ class Api(object):
 
     def auth(self, username, password):
         self.username, self.password = username, password
-
         response = requests.post(
             'https://oauth.yandex.ru/token',
             data=dict(
@@ -274,7 +278,7 @@ class Api(object):
         )
 
         assert response.status_code == 200, response.content
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode("utf-8"))
         self.token = data['access_token']
         return self.token
 
@@ -336,7 +340,8 @@ class Api(object):
         description = description or u''
 
         try:
-            from pyexiv2 import Image as ImageExif
+            #from pyexiv2 import Image as ImageExif
+            from pyexiv2 import ImageMetadata as ImageExif
         except:
             logging.warning('can\'t find python-pyexiv2 library, exif extraction will be disabled.')
             ImageExif = None
@@ -345,7 +350,8 @@ class Api(object):
             try:
                 exif = ImageExif(filename)
                 try:
-                    exif.readMetadata()
+                    #exif.readMetadata()
+                    exif.read()
                     try: tags = tags or u','.join(t for t in (smart_unicode(tag) \
                                     for tag in exif['Iptc.Application2.Keywords']) if t)
                     except KeyError: pass
@@ -393,4 +399,3 @@ class Api(object):
             ),
         )
         return Photo(self, response)
-
